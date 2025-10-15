@@ -1,0 +1,69 @@
+{
+  "name": "sbdsa-app",
+  "version": "1.0.0",
+  "description": "South African Powerlifting App - SBD SA",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "npm install && npm run setup",
+    "setup": "npm run setup:mobile && npm run setup:backend && npm run setup:shared",
+    "setup:mobile": "cd packages/mobile && npm install",
+    "setup:backend": "cd packages/backend && npm install",
+    "setup:shared": "cd packages/shared && npm install",
+    "clean": "npm run clean:mobile && npm run clean:backend && npm run clean:shared && rm -rf node_modules",
+    "clean:mobile": "cd packages/mobile && npx react-native clean",
+    "clean:backend": "cd packages/backend && rm -rf node_modules",
+    "clean:shared": "cd packages/shared && rm -rf node_modules",
+    "android": "cd packages/mobile && npx react-native run-android",
+    "ios": "cd packages/mobile && npx react-native run-ios",
+    "start": "cd packages/mobile && npx react-native start",
+    "test": "npm run test:shared && npm run test:backend && npm run test:mobile",
+    "test:shared": "cd packages/shared && npm test",
+    "test:mobile": "cd packages/mobile && npm test",
+    "test:backend": "cd packages/backend && npm test",
+    "test:watch": "npm run test:shared -- --watch && npm run test:backend -- --watch && npm run test:mobile -- --watch",
+    "test:coverage": "npm run test:shared -- --coverage && npm run test:backend -- --coverage && npm run test:mobile -- --coverage",
+    "test:ci": "npm run test:shared && npm run test:backend && npm run test:mobile -- --ci --coverage --watchAll=false",
+    "test:e2e": "cd packages/mobile && npm run test:e2e",
+    "lint": "npm run lint:mobile && npm run lint:backend && npm run lint:shared",
+    "lint:mobile": "cd packages/mobile && npm run lint",
+    "lint:backend": "cd packages/backend && npm run lint",
+    "lint:shared": "cd packages/shared && npm run lint",
+    "build:backend": "cd packages/backend && npm run build",
+    "build:shared": "cd packages/shared && npm run build"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-native": "^4.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

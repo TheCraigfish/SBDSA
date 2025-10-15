@@ -1,0 +1,11 @@
+{
+  "preset": "react-native",
+  "setupFilesAfterEnv": ["<rootDir>/init.js"],
+  "testMatch": [
+    "**/*.e2e.js"
+  ],
+  "testTimeout": 120000,
+  "transform": {
+    "^.+\\.js$": "<rootDir>/node_modules/react-native/jest/preprocessor.js"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": false,
+    "tsConfigPath": "tsconfig.json"
+  },
+  "projects": {
+    "auth": {
+      "type": "library",
+      "root": "src/auth",
+      "entryFile": "index",
+      "sourceRoot": "src/auth",
+      "compilerOptions": {
+        "tsConfigPath": "src/auth/tsconfig.lib.json"
+      }
+    },
+    "users": {
+      "type": "library",
+      "root": "src/users",
+      "entryFile": "index",
+      "sourceRoot": "src/users",
+      "compilerOptions": {
+        "tsConfigPath": "src/users/tsconfig.lib.json"
+      }
+    },
+    "workouts": {
+      "type": "library",
+      "root": "src/workouts",
+      "entryFile": "index",
+      "sourceRoot": "src/workouts",
+      "compilerOptions": {
+        "tsConfigPath": "src/workouts/tsconfig.lib.json"
+      }
+    },
+    "programs": {
+      "type": "library",
+      "root": "src/programs",
+      "entryFile": "index",
+      "sourceRoot": "src/programs",
+      "compilerOptions": {
+        "tsConfigPath": "src/programs/tsconfig.lib.json"
+      }
+    },
+    "analytics": {
+      "type": "library",
+      "root": "src/analytics",
+      "entryFile": "index",
+      "sourceRoot": "src/analytics",
+      "compilerOptions": {
+        "tsConfigPath": "src/analytics/tsconfig.lib.json"
+      }
+    },
+    "competitions": {
+      "type": "library",
+      "root": "src/competitions",
+      "entryFile": "index",
+      "sourceRoot": "src/competitions",
+      "compilerOptions": {
+        "tsConfigPath": "src/competitions/tsconfig.lib.json"
+      }
+    }
+  }
+}

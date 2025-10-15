@@ -1,0 +1,27 @@
+{
+  "name": "SBD SA",
+  "displayName": "SBD SA - South African Powerlifting",
+  "version": "1.0.0",
+  "description": "South African Powerlifting App for tracking workouts, progress, and competitions",
+  "orientation": "portrait",
+  "icon": "./src/assets/images/icon.png",
+  "splash": {
+    "image": "./src/assets/images/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#1a1a1a"
+  },
+  "platforms": ["android", "ios"],
+  "android": {
+    "package": "co.za.sbdsa.app",
+    "versionCode": 1,
+    "adaptiveIcon": {
+      "foregroundImage": "./src/assets/images/adaptive-icon.png",
+      "backgroundColor": "#1a1a1a"
+    }
+  },
+  "ios": {
+    "bundleIdentifier": "co.za.sbdsa.app",
+    "buildNumber": "1.0.0",
+    "supportsTablet": false
+  }
+}

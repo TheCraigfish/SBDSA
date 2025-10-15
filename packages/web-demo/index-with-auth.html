@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBD SA - South African Powerlifting App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .tagline {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .api-status {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .api-status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .api-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            border-left: 4px solid #0056b3;
+        }
+        .feature-card h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .api-endpoint {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background-color: #004494;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #0056b3;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .calculation-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .profile-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .profile-field {
+            margin-bottom: 10px;
+        }
+        .profile-field strong {
+            display: inline-block;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <div class="logo">SBD SA</div>
+                <div class="tagline">South African Powerlifting App</div>
+            </div>
+            <div class="user-info" id="userInfo">
+                <span id="userDisplay">Not logged in</span>
+                <button id="logoutBtn" class="btn btn-secondary" style="display: none;" onclick="logout()">Logout</button>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <h2>API Status</h2>
+                <div id="apiStatus" class="api-status">Checking API connection...</div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('features')">Features</div>
+                <div class="tab" onclick="showTab('calculations')">Calculations</div>
+                <div class="tab" onclick="showTab('account')">Account</div>
+                <div class="tab" onclick="showTab('api')">API Testing</div>
+            </div>
+            
+            <div id="features" class="tab-content active">
+                <div class="section">
+                    <h2>App Features</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h3>Workout Tracking</h3>
+                            <p>Log your workouts, track progress, and analyze performance over time.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>1RM Calculations</h3>
+                            <p>Calculate your one-rep max using multiple proven formulas (Brzycki, Lombardi, etc.).</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Plate Calculator</h3>
+                            <p>Automatically calculate the plates needed for your target weight with South African and American configurations.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Wilks Score</h3>
+                            <p>Calculate your Wilks score to compare strength relative to bodyweight.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Program Library</h3>
+                            <p>Access powerlifting programs tailored for South African lifters.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Competition Tracking</h3>
+                            <p>Track South African powerlifting competitions and your performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="calculations" class="tab-content">
+                <div class="section">
+                    <h2>One Rep Max Calculator</h2>
+                    <div class="calculation-form">
+                        <div class="form-group">
+                            <label for="weight">Weight (kg):</label>
+                            <input type="number" id="weight" placeholder="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="reps">Reps:</label>
+                            <input type="number" id="reps" placeholder="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="formula">Formula:</label>
+                            <select id="formula">
+                                <option value="brzycki">Brzycki</option>
+                                <option value="epley">Epley</option>
+                                <option value="lombardi">Lombardi</option>
+                                <option value="oconnor">O'Connor</option>
+                                <option value="average">Average</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn" onclick="calculate1RM()">Calculate 1RM</button>
+                        </div>
+                    </div>
+                    <div id="rmResult" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>Plate Calculator</h2>
+                    <div class="calculation-form">
+                        <div class="form-group">
+                            <label for="totalWeight">Total Weight (kg):</label>
+                            <input type="number" id="totalWeight" placeholder="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="plateConfig">Plate Configuration:</label>
+                            <select id="plateConfig">
+                                <option value="sa">South African</option>
+                                <option value="american">American</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn" onclick="calculatePlates()">Calculate Plates</button>
+                        </div>
+                    </div>
+                    <div id="platesResult" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>Wilks Score Calculator</h2>
+                    <div class="calculation-form">
+                        <div class="form-group">
+                            <label for="bodyWeight">Body Weight (kg):</label>
+                            <input type="number" id="bodyWeight" placeholder="83">
+                        </div>
+                        <div class="form-group">
+                            <label for="total">Total Lifted (kg):</label>
+                            <input type="number" id="total" placeholder="500">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender:</label>
+                            <select id="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn" onclick="calculateWilks()">Calculate Wilks</button>
+                        </div>
+                    </div>
+                    <div id="wilksResult" class="result" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div id="account" class="tab-content">
+                <!-- Login/Register Form (shown when not logged in) -->
+                <div id="authForms" class="auth-container">
+                    <div class="section">
+                        <h2>Login</h2>
+                        <div class="form-group">
+                            <label for="loginEmail">Email:</label>
+                            <input type="email" id="loginEmail" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password:</label>
+                            <input type="password" id="loginPassword" placeholder="Password">
+                        </div>
+                        <button class="btn" onclick="login()">Login</button>
+                        <p>Don't have an account? <a href="#" onclick="toggleAuthForm()">Register here</a></p>
+                        <div id="loginResult" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="section" id="registerForm" style="display: none;">
+                        <h2>Register</h2>
+                        <div class="form-group">
+                            <label for="registerEmail">Email:</label>
+                            <input type="email" id="registerEmail" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password:</label>
+                            <input type="password" id="registerPassword" placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerFirstName">First Name:</label>
+                            <input type="text" id="registerFirstName" placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerLastName">Last Name:</label>
+                            <input type="text" id="registerLastName" placeholder="Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerMembershipNumber">Membership Number (Optional):</label>
+                            <input type="text" id="registerMembershipNumber" placeholder="PSA123456">
+                        </div>
+                        <button class="btn" onclick="register()">Register</button>
+                        <p>Already have an account? <a href="#" onclick="toggleAuthForm()">Login here</a></p>
+                        <div id="registerResult" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <!-- Profile Management (shown when logged in) -->
+                <div id="profileSection" style="display: none;">
+                    <div class="section">
+                        <h2>User Profile</h2>
+                        <div id="userProfile" class="profile-card"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Edit Profile</h2>
+                        <div class="calculation-form">
+                            <div class="form-group">
+                                <label for="profileBio">Bio:</label>
+                                <textarea id="profileBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="profileLocation">Location:</label>
+                                <input type="text" id="profileLocation" placeholder="Johannesburg, SA">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileGym">Gym:</label>
+                                <input type="text" id="profileGym" placeholder="Powerlifting Gym">
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn" onclick="updateProfile()">Update Profile</button>
+                            </div>
+                        </div>
+                        <div id="profileUpdateResult" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Change Password</h2>
+                        <div class="calculation-form">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password:</label>
+                                <input type="password" id="currentPassword" placeholder="Current password">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">New Password:</label>
+                                <input type="password" id="newPassword" placeholder="New password">
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn" onclick="changePassword()">Change Password</button>
+                            </div>
+                        </div>
+                        <div id="passwordChangeResult" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="api" class="tab-content">
+                <div class="section">
+                    <h2>API Endpoints</h2>
+                    <p>Test the backend API endpoints:</p>
+                    
+                    <div class="api-endpoint">GET /api/programs</div>
+                    <button class="btn" onclick="testAPI('programs', 'GET')">Get Programs</button>
+                    <div id="programsResult" class="result" style="display: none;"></div>
+                    
+                    <div class="api-endpoint">GET /api/workouts</div>
+                    <button class="btn" onclick="testAPI('workouts', 'GET')">Get Workouts</button>
+                    <div id="workoutsResult" class="result" style="display: none;"></div>
+                    
+                    <div class="api-endpoint">GET /api/competitions</div>
+                    <button class="btn" onclick="testAPI('competitions', 'GET')">Get Competitions</button>
+                    <div id="competitionsResult" class="result" style="display: none;"></div>
+                    
+                    <div class="api-endpoint">GET /api/analytics/stats</div>
+                    <button class="btn" onclick="testAPI('analytics/stats', 'GET')">Get Stats</button>
+                    <div id="statsResult" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let currentUser = null;
+        let authTokens = null;
+        
+        // Check API status on page load
+        window.onload = function() {
+            checkAPIStatus();
+            checkAuthStatus();
+        };
+        
+        function checkAPIStatus() {
+            const statusElement = document.getElementById('apiStatus');
+            
+            fetch(API_BASE_URL + '/programs')
+                .then(response => {
+                    if (response.ok) {
+                        statusElement.className = 'api-status success';
+                        statusElement.textContent = '✅ API Connection Successful - Backend is running on localhost:3000';
+                    } else {
+                        throw new Error('API returned error status');
+                    }
+                })
+                .catch(error => {
+                    statusElement.className = 'api-status error';
+                    statusElement.textContent = '❌ API Connection Failed - Make sure the backend server is running on localhost:3000';
+                    console.error('API check failed:', error);
+                });
+        }
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        function checkAuthStatus() {
+            const storedTokens = localStorage.getItem('authTokens');
+            if (storedTokens) {
+                try {
+                    authTokens = JSON.parse(storedTokens);
+                    // Verify token is still valid by fetching user profile
+                    fetchWithAuth(API_BASE_URL + '/users/profile')
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error('Token expired');
+                            }
+                        })
+                        .then(data => {
+                            currentUser = data.data;
+                            showUserProfile();
+                        })
+                        .catch(error => {
+                            console.error('Auth check failed:', error);
+                            localStorage.removeItem('authTokens');
+                            authTokens = null;
+                            currentUser = null;
+                        });
+                } catch (error) {
+                    console.error('Failed to parse stored tokens:', error);
+                    localStorage.removeItem('authTokens');
+                }
+            }
+        }
+        
+        function showUserProfile() {
+            document.getElementById('authForms').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'block';
+            
+            // Update user info in header
+            document.getElementById('userDisplay').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+            document.getElementById('logoutBtn').style.display = 'inline-block';
+            
+            const profileElement = document.getElementById('userProfile');
+            profileElement.innerHTML = `
+                <div class="profile-field"><strong>Name:</strong> ${currentUser.firstName} ${currentUser.lastName}</div>
+                <div class="profile-field"><strong>Email:</strong> ${currentUser.email}</div>
+                <div class="profile-field"><strong>Membership:</strong> ${currentUser.membershipNumber || 'Not provided'}</div>
+                <div class="profile-field"><strong>Preferred Units:</strong> ${currentUser.preferredUnits}</div>
+                <div class="profile-field"><strong>Account Status:</strong> ${currentUser.isActive ? 'Active' : 'Inactive'}</div>
+                <div class="profile-field"><strong>Member Since:</strong> ${new Date(currentUser.createdAt).toLocaleDateString()}</div>
+            `;
+            
+            // Load extended profile if available
+            fetchWithAuth(API_BASE_URL + '/users/profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.data && data.data.bio) {
+                        document.getElementById('profileBio').value = data.data.bio || '';
+                        document.getElementById('profileLocation').value = data.data.location || '';
+                        document.getElementById('profileGym').value = data.data.gym || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load extended profile:', error);
+                });
+        }
+        
+        function toggleAuthForm() {
+            const loginForm = document.querySelector('#authForms .section:first-child');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+        }
+        
+        function fetchWithAuth(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            
+            if (authTokens && authTokens.accessToken) {
+                defaultOptions.headers.Authorization = `Bearer ${authTokens.accessToken}`;
+            }
+            
+            return fetch(url, { ...defaultOptions, ...options });
+        }
+        
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            const resultElement = document.getElementById('loginResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = 'Logging in...';
+            
+            fetch(API_BASE_URL + '/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Login failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                authTokens = data.tokens;
+                currentUser = data.user;
+                
+                // Store tokens in localStorage
+                localStorage.setItem('authTokens', JSON.stringify(authTokens));
+                
+                resultElement.textContent = 'Login successful! Redirecting...';
+                setTimeout(() => {
+                    showUserProfile();
+                }, 1000);
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Login failed:', error);
+            });
+        }
+        
+        function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
+            const membershipNumber = document.getElementById('registerMembershipNumber').value;
+            
+            if (!email || !password || !firstName || !lastName) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const resultElement = document.getElementById('registerResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = 'Registering...';
+            
+            fetch(API_BASE_URL + '/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    email, 
+                    password, 
+                    firstName, 
+                    lastName, 
+                    membershipNumber: membershipNumber || undefined 
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Registration failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                authTokens = data.tokens;
+                currentUser = data.user;
+                
+                // Store tokens in localStorage
+                localStorage.setItem('authTokens', JSON.stringify(authTokens));
+                
+                resultElement.textContent = 'Registration successful! Redirecting...';
+                setTimeout(() => {
+                    showUserProfile();
+                }, 1000);
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Registration failed:', error);
+            });
+        }
+        
+        function logout() {
+            if (!authTokens) return;
+            
+            fetchWithAuth(API_BASE_URL + '/auth/logout', {
+                method: 'POST',
+            })
+            .then(() => {
+                // Clear stored tokens and user data
+                localStorage.removeItem('authTokens');
+                authTokens = null;
+                currentUser = null;
+                
+                // Show login form
+                document.getElementById('authForms').style.display = 'block';
+                document.getElementById('profileSection').style.display = 'none';
+                
+                // Update user info in header
+                document.getElementById('userDisplay').textContent = 'Not logged in';
+                document.getElementById('logoutBtn').style.display = 'none';
+                
+                // Clear form fields
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerFirstName').value = '';
+                document.getElementById('registerLastName').value = '';
+                document.getElementById('registerMembershipNumber').value = '';
+            })
+            .catch(error => {
+                console.error('Logout failed:', error);
+                // Even if logout API fails, clear local data
+                localStorage.removeItem('authTokens');
+                authTokens = null;
+                currentUser = null;
+                document.getElementById('authForms').style.display = 'block';
+                document.getElementById('profileSection').style.display = 'none';
+                document.getElementById('userDisplay').textContent = 'Not logged in';
+                document.getElementById('logoutBtn').style.display = 'none';
+            });
+        }
+        
+        function updateProfile() {
+            const bio = document.getElementById('profileBio').value;
+            const location = document.getElementById('profileLocation').value;
+            const gym = document.getElementById('profileGym').value;
+            
+            const resultElement = document.getElementById('profileUpdateResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = 'Updating profile...';
+            
+            fetchWithAuth(API_BASE_URL + '/users/profile', {
+                method: 'POST',
+                body: JSON.stringify({ bio, location, gym }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Profile update failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultElement.textContent = 'Profile updated successfully!';
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Profile update failed:', error);
+            });
+        }
+        
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            if (!currentPassword || !newPassword) {
+                alert('Please enter both current and new passwords');
+                return;
+            }
+            
+            const resultElement = document.getElementById('passwordChangeResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = 'Changing password...';
+            
+            fetchWithAuth(API_BASE_URL + '/auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    currentPassword,
+                    newPassword,
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Password change failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(() => {
+                resultElement.textContent = 'Password changed successfully!';
+                // Clear form fields
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Password change failed:', error);
+            });
+        }
+        
+        function calculate1RM() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const reps = parseInt(document.getElementById('reps').value);
+            const formula = document.getElementById('formula').value;
+            
+            if (isNaN(weight) || isNaN(reps) || reps < 1) {
+                alert('Please enter valid weight and reps (reps must be at least 1)');
+                return;
+            }
+            
+            let estimated1RM;
+            
+            switch (formula) {
+                case 'brzycki':
+                    estimated1RM = Math.round(weight * (36 / (37 - reps)) * 1.04);
+                    break;
+                case 'epley':
+                    estimated1RM = Math.round(weight * (1 + reps / 30));
+                    break;
+                case 'lombardi':
+                    estimated1RM = Math.round(weight * Math.pow(reps, 0.10) * 0.91);
+                    break;
+                case 'oconnor':
+                    estimated1RM = Math.round(weight * (1 + reps / 40));
+                    break;
+                case 'average':
+                    const brzycki = Math.round(weight * (36 / (37 - reps)) * 1.04);
+                    const epley = Math.round(weight * (1 + reps / 30));
+                    const lombardi = Math.round(weight * Math.pow(reps, 0.10) * 0.91);
+                    const oconnor = Math.round(weight * (1 + reps / 40));
+                    estimated1RM = Math.round((brzycki + epley + lombardi + oconnor) / 4 - 1);
+                    break;
+                default:
+                    estimated1RM = 0;
+            }
+            
+            const resultElement = document.getElementById('rmResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = `Estimated 1RM using ${formula.charAt(0).toUpperCase() + formula.slice(1)} formula: ${estimated1RM} kg`;
+        }
+        
+        function calculatePlates() {
+            const totalWeight = parseFloat(document.getElementById('totalWeight').value);
+            const plateConfig = document.getElementById('plateConfig').value;
+            
+            if (isNaN(totalWeight) || totalWeight < 20) {
+                alert('Please enter a valid total weight (minimum 20kg for the bar)');
+                return;
+            }
+            
+            let barWeight, unit, plates;
+            
+            if (plateConfig === 'sa') {
+                barWeight = 20;
+                unit = 'kg';
+                plates = [25, 20, 15, 10, 5, 2.5, 1.25, 0.5];
+            } else {
+                barWeight = 45;
+                unit = 'lb';
+                plates = [45, 35, 25, 15, 10, 5, 2.5];
+            }
+            
+            const weightPerSide = (totalWeight - barWeight) / 2;
+            const result = [];
+            let remainingWeight = weightPerSide;
+            
+            for (const plate of plates) {
+                const count = Math.floor(remainingWeight / plate);
+                if (count > 0) {
+                    result.push(`${count} × ${plate}${unit}`);
+                    remainingWeight -= count * plate;
+                }
+            }
+            
+            const resultElement = document.getElementById('platesResult');
+            resultElement.style.display = 'block';
+            
+            if (result.length > 0) {
+                resultElement.textContent = `To load ${totalWeight}${unit} (${barWeight}${unit} bar):\n\n` +
+                    `Each side: ${result.join(', ')}\n` +
+                    `Remaining weight per side: ${remainingWeight.toFixed(2)}${unit}`;
+            } else {
+                resultElement.textContent = `No plates needed. Just the ${barWeight}${unit} bar.`;
+            }
+        }
+        
+        function calculateWilks() {
+            const bodyWeight = parseFloat(document.getElementById('bodyWeight').value);
+            const total = parseFloat(document.getElementById('total').value);
+            const gender = document.getElementById('gender').value;
+            
+            if (isNaN(bodyWeight) || isNaN(total) || bodyWeight < 40 || total < 100) {
+                alert('Please enter valid body weight (min 40kg) and total lifted (min 100kg)');
+                return;
+            }
+            
+            let wilksCoeff;
+            
+            if (gender === 'male') {
+                const a = -216.0475144;
+                const b = 16.2606339;
+                const c = -0.002388645;
+                const d = -0.00113732;
+                const e = 7.01863e-06;
+                const f = -1.291e-08;
+                
+                const x = bodyWeight;
+                wilksCoeff = 500 / (a + b * x + c * x * x + d * x * x * x + e * x * x * x * x + f * x * x * x * x * x);
+            } else {
+                const a = 594.31747775582;
+                const b = -27.23842536447;
+                const c = 0.82112226871;
+                const d = -0.00930733913;
+                const e = 4.731582e-05;
+                const f = -9.054e-08;
+                
+                const x = bodyWeight;
+                wilksCoeff = 500 / (a + b * x + c * x * x + d * x * x * x + e * x * x * x * x + f * x * x * x * x * x);
+            }
+            
+            const wilksScore = Math.round(total * wilksCoeff * 100) / 100;
+            
+            const resultElement = document.getElementById('wilksResult');
+            resultElement.style.display = 'block';
+            resultElement.textContent = `Wilks Score for ${gender} (${bodyWeight}kg BW, ${total}kg Total): ${wilksScore}`;
+        }
+        
+        function testAPI(endpoint, method) {
+            const resultElement = document.getElementById(endpoint.replace('/', '') + 'Result');
+            resultElement.style.display = 'block';
+            resultElement.textContent = 'Loading...';
+            
+            fetch(API_BASE_URL + '/' + endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultElement.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('API test failed:', error);
+            });
+        }
+    </script>
+</body>
+</html>

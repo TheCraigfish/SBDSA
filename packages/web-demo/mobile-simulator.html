@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBD SA Mobile Simulator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .mobile-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background-color: #222;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .phone-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background-color: #222;
+            border-radius: 0 0 15px 15px;
+            z-index: 2;
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #0056b3;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+        }
+        
+        .app-content {
+            height: calc(100% - 44px);
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+        }
+        
+        .tab-item.active {
+            color: #0056b3;
+        }
+        
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .screen-content {
+            padding: 20px;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #004494;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .toggle-text {
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .toggle-text a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+        
+        .dashboard {
+            text-align: center;
+        }
+        
+        .welcome {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info p {
+            margin: 5px 0;
+            text-align: left;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .action-card h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        
+        .controls {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+        }
+        
+        .controls h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .notification {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41 AM</span>
+                    <span>SBD SA</span>
+                    <span>100% 🔋</span>
+                </div>
+                <div class="app-content">
+                    <div class="notification" id="notification"></div>
+                    
+                    <!-- Login Screen -->
+                    <div id="loginScreen" class="screen active">
+                        <div class="auth-container">
+                            <div class="logo">SBD SA</div>
+                            <div class="tagline">South African Powerlifting</div>
+                            
+                            <div class="form-group">
+                                <label for="mobileEmail">Email</label>
+                                <input type="email" id="mobileEmail" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="mobilePassword">Password</label>
+                                <input type="password" id="mobilePassword" placeholder="Password">
+                            </div>
+                            <button class="btn" onclick="mobileLogin()">Login</button>
+                            
+                            <div class="toggle-text">
+                                Don't have an account? <a href="#" onclick="toggleMobileScreen('register')">Register</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Register Screen -->
+                    <div id="registerScreen" class="screen">
+                        <div class="auth-container">
+                            <div class="logo">SBD SA</div>
+                            <div class="tagline">South African Powerlifting</div>
+                            
+                            <div class="form-group">
+                                <label for="registerEmail">Email</label>
+                                <input type="email" id="registerEmail" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPassword">Password</label>
+                                <input type="password" id="registerPassword" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerFirstName">First Name</label>
+                                <input type="text" id="registerFirstName" placeholder="John">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerLastName">Last Name</label>
+                                <input type="text" id="registerLastName" placeholder="Doe">
+                            </div>
+                            <button class="btn" onclick="mobileRegister()">Register</button>
+                            
+                            <div class="toggle-text">
+                                Already have an account? <a href="#" onclick="toggleMobileScreen('login')">Login</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Screen -->
+                    <div id="dashboardScreen" class="screen">
+                        <div class="screen-content">
+                            <div class="dashboard">
+                                <div class="welcome">Welcome, <span id="mobileUserName">User</span>!</div>
+                                
+                                <div class="user-info">
+                                    <p><strong>Email:</strong> <span id="mobileUserEmail">user@example.com</span></p>
+                                    <p><strong>Membership:</strong> <span id="mobileUserMembership">Not provided</span></p>
+                                    <p><strong>Preferred Units:</strong> <span id="mobileUserUnits">kg</span></p>
+                                </div>
+                                
+                                <div class="quick-actions">
+                                    <div class="action-card">
+                                        <h3>1RM Calculator</h3>
+                                        <p>Calculate your one-rep max</p>
+                                    </div>
+                                    <div class="action-card">
+                                        <h3>Plate Calculator</h3>
+                                        <p>Calculate plate loading</p>
+                                    </div>
+                                    <div class="action-card">
+                                        <h3>Wilks Score</h3>
+                                        <p>Calculate your Wilks score</p>
+                                    </div>
+                                    <div class="action-card">
+                                        <h3>Workouts</h3>
+                                        <p>Log your training</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-bar">
+                        <div class="tab-item active">
+                            <div class="tab-icon">🏠</div>
+                            <span>Home</span>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">💪</div>
+                            <span>Workouts</span>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">📊</div>
+                            <span>Analytics</span>
+                        </div>
+                        <div class="tab-item">
+                            <div class="tab-icon">👤</div>
+                            <span>Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <h3>Mobile Simulator Controls</h3>
+            
+            <div class="control-group">
+                <label for="phoneModel">Phone Model:</label>
+                <select id="phoneModel" onchange="changePhoneModel()">
+                    <option value="iphone">iPhone X</option>
+                    <option value="android">Android</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="screenSize">Screen Size:</label>
+                <select id="screenSize" onchange="changeScreenSize()">
+                    <option value="normal">Normal</option>
+                    <option value="large">Large</option>
+                    <option value="small">Small</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="orientation">Orientation:</label>
+                <select id="orientation" onchange="changeOrientation()">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button class="btn btn-secondary" onclick="resetSimulator()">Reset Simulator</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let currentUser = null;
+        let authTokens = null;
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.backgroundColor = type === 'error' ? '#d32f2f' : '#333';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        function toggleMobileScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screen + 'Screen').classList.add('active');
+        }
+        
+        function mobileLogin() {
+            const email = document.getElementById('mobileEmail').value;
+            const password = document.getElementById('mobilePassword').value;
+            
+            if (!email || !password) {
+                showNotification('Please enter both email and password', 'error');
+                return;
+            }
+            
+            fetch(API_BASE_URL + '/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Login failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                authTokens = data.tokens;
+                currentUser = data.user;
+                
+                // Update UI with user data
+                document.getElementById('mobileUserName').textContent = currentUser.firstName;
+                document.getElementById('mobileUserEmail').textContent = currentUser.email;
+                document.getElementById('mobileUserMembership').textContent = currentUser.membershipNumber || 'Not provided';
+                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits;
+                
+                // Show dashboard
+                toggleMobileScreen('dashboard');
+                showNotification('Login successful!');
+            })
+            .catch(error => {
+                showNotification(`Login failed: ${error.message}`, 'error');
+                console.error('Login failed:', error);
+            });
+        }
+        
+        function mobileRegister() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
+            
+            if (!email || !password || !firstName || !lastName) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            fetch(API_BASE_URL + '/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, firstName, lastName }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Registration failed: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                authTokens = data.tokens;
+                currentUser = data.user;
+                
+                // Update UI with user data
+                document.getElementById('mobileUserName').textContent = currentUser.firstName;
+                document.getElementById('mobileUserEmail').textContent = currentUser.email;
+                document.getElementById('mobileUserMembership').textContent = currentUser.membershipNumber || 'Not provided';
+                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits;
+                
+                // Show dashboard
+                toggleMobileScreen('dashboard');
+                showNotification('Registration successful!');
+            })
+            .catch(error => {
+                showNotification(`Registration failed: ${error.message}`, 'error');
+                console.error('Registration failed:', error);
+            });
+        }
+        
+        function changePhoneModel() {
+            const model = document.getElementById('phoneModel').value;
+            const phoneFrame = document.querySelector('.phone-frame');
+            
+            if (model === 'android') {
+                phoneFrame.style.borderRadius = '20px';
+                document.querySelector('.phone-notch').style.display = 'none';
+            } else {
+                phoneFrame.style.borderRadius = '40px';
+                document.querySelector('.phone-notch').style.display = 'block';
+            }
+        }
+        
+        function changeScreenSize() {
+            const size = document.getElementById('screenSize').value;
+            const phoneFrame = document.querySelector('.phone-frame');
+            
+            switch (size) {
+                case 'large':
+                    phoneFrame.style.transform = 'scale(1.1)';
+                    break;
+                case 'small':
+                    phoneFrame.style.transform = 'scale(0.9)';
+                    break;
+                default:
+                    phoneFrame.style.transform = 'scale(1)';
+            }
+        }
+        
+        function changeOrientation() {
+            const orientation = document.getElementById('orientation').value;
+            const phoneFrame = document.querySelector('.phone-frame');
+            const mobileContainer = document.querySelector('.mobile-container');
+            
+            if (orientation === 'landscape') {
+                phoneFrame.style.transform = 'rotate(90deg)';
+                mobileContainer.style.flexDirection = 'column';
+            } else {
+                phoneFrame.style.transform = 'rotate(0deg)';
+                mobileContainer.style.flexDirection = 'row';
+            }
+        }
+        
+        function resetSimulator() {
+            // Reset to login screen
+            toggleMobileScreen('login');
+            
+            // Clear form fields
+            document.getElementById('mobileEmail').value = '';
+            document.getElementById('mobilePassword').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('registerFirstName').value = '';
+            document.getElementById('registerLastName').value = '';
+            
+            // Reset phone model
+            document.getElementById('phoneModel').value = 'iphone';
+            changePhoneModel();
+            
+            // Reset screen size
+            document.getElementById('screenSize').value = 'normal';
+            changeScreenSize();
+            
+            // Reset orientation
+            document.getElementById('orientation').value = 'portrait';
+            changeOrientation();
+            
+            // Clear user data
+            currentUser = null;
+            authTokens = null;
+            
+            showNotification('Simulator reset');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+export { User } from './user.entity';
+export { UserProfile } from './user-profile.entity';
+export { Exercise } from './exercise.entity';
+export { Workout } from './workout.entity';
+export { WorkoutExercise } from './workout-exercise.entity';
+export { Set } from './set.entity';
+export { PersonalRecord } from './personal-record.entity';
+export { Program } from './program.entity';
+export { ProgramWorkout } from './program-workout.entity';
+export { UserProgram } from './user-program.entity';
+export { Competition } from './competition.entity';

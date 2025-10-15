@@ -1,0 +1,179 @@
+{
+  "title": "SBD SA - South African Powerlifting",
+  "shortDescription": "Official powerlifting training app for South African athletes",
+  "fullDescription": "SBD SA is the premier powerlifting training app designed specifically for South African athletes. Whether you're a beginner or an elite lifter, our app provides everything you need to track your progress, follow proven training programs, and compete in South African powerlifting events.\n\nKEY FEATURES:\n\n🏋️‍♂️ TRAINING LOGS\n• Track your squat, bench press, and deadlift workouts\n• Calculate your 1RM using proven formulas (Brzycki, Epley, etc.)\n• Automatic plate calculator for South African gym plates\n• RPE (Rate of Perceived Exertion) tracking for optimal training\n• Rest timer between sets\n\n📱 SOUTH AFRICAN SPECIFIC\n• Designed for South African powerlifting standards\n• Support for kg and lbs measurements\n• Localized for South African gym conditions\n• Integration with SBD South Africa events\n• Membership number tracking for SBD SA members\n\n📊 PROGRESS ANALYSIS\n• Personal record tracking\n• Wilks score calculation for fair strength comparison\n• Training volume and intensity graphs\n• Bodyweight and strength ratio analysis\n• Monthly and yearly progress reports\n\n🏆 TRAINING PROGRAMS\n• 5/3/1 Powerlifting Program\n• Starting Strength for beginners\n• Custom program creation\n• Program templates from South African coaches\n• Weekly training schedules\n\n🔄 OFFLINE SUPPORT\n• Full offline functionality for gym areas with poor connectivity\n• Automatic sync when connection is restored\n• No internet required for workout logging\n• Local data storage on your device\n\n🎯 COMPETITION PREP\n• Meet preparation tools\n• Weight class tracking\n• Attempt selection calculator\n• Competition day checklist\n• South African powerlifting rules reference\n\nPERFECT FOR:\n• Powerlifters training in South Africa\n• SBD South Africa members\n• Gym-goers wanting to start powerlifting\n• Coaches training powerlifting athletes\n• Anyone interested in strength training\n\nWHY CHOOSE SBD SA?\n\nBuilt specifically for the South African powerlifting community, SBD SA understands the unique challenges of training in South Africa. From connectivity issues in rural areas to the specific equipment found in South African gyms, our app is designed to help you succeed regardless of your location or experience level.\n\nDownload SBD SA today and join the growing community of South African powerlifters who are taking their strength to the next level!",
+  "releaseNotes": "Version 1.0.0 - Initial Release\n\n• Complete workout tracking for powerlifting\n• South African plate calculator\n• 1RM calculation with multiple formulas\n• Offline support for poor connectivity areas\n• Integration with SBD South Africa\n• Personal record tracking\n• Training programs for all levels\n• Progress analysis and reporting\n\nWe're excited to bring the first powerlifting app designed specifically for South African athletes!",
+  "category": "Health & Fitness",
+  "tags": [
+    "powerlifting",
+    "strength training",
+    "workout",
+    "fitness",
+    "gym",
+    "squat",
+    "bench press",
+    "deadlift",
+    "SBD",
+    "South Africa",
+    "1RM",
+    "training",
+    "lifting",
+    "weights",
+    "progress tracking"
+  ],
+  "contentRating": "Everyone",
+  "privacyPolicyUrl": "https://sbd-sa.co.za/privacy-policy",
+  "websiteUrl": "https://sbd-sa.co.za",
+  "contactEmail": "support@sbd-sa.co.za",
+  "contactPhone": "+27 12 345 6789",
+  "contactWebsite": "https://sbd-sa.co.za/contact",
+  "facebookUrl": "https://facebook.com/SBDSouthAfrica",
+  "instagramUrl": "https://instagram.com/sbd_south_africa",
+  "youtubeUrl": "https://youtube.com/channel/SBDSA",
+  "screenshots": [
+    {
+      "phoneImage": "screenshots/main-workout-screen.png",
+      "caption": "Track your daily workouts with our intuitive interface"
+    },
+    {
+      "phoneImage": "screenshots/1rm-calculator.png",
+      "caption": "Calculate your 1RM using proven scientific formulas"
+    },
+    {
+      "phoneImage": "screenshots/plate-calculator.png",
+      "caption": "Automatically calculate plates for South African gyms"
+    },
+    {
+      "phoneImage": "screenshots/progress-tracking.png",
+      "caption": "Monitor your progress with detailed analytics"
+    },
+    {
+      "phoneImage": "screenshots/training-programs.png",
+      "caption": "Follow proven training programs for all levels"
+    },
+    {
+      "phoneImage": "screenshots/offline-mode.png",
+      "caption": "Works offline - perfect for areas with poor connectivity"
+    },
+    {
+      "phoneImage": "screenshots/sbd-integration.png",
+      "caption": "Integrated with SBD South Africa events and membership"
+    },
+    {
+      "phoneImage": "screenshots/progress-charts.png",
+      "caption": "Visualize your strength gains over time"
+    }
+  ],
+  "promoVideo": {
+    "youtubeUrl": "https://youtube.com/watch?v=sbd-sa-promo",
+    "caption": "See SBD SA in action - the ultimate powerlifting companion for South African athletes"
+  },
+  "icon": "store-assets/icon-1024x1024.png",
+  "featureGraphic": "store-assets/feature-graphic-1024x500.png",
+  "localeSpecific": {
+    "en-ZA": {
+      "title": "SBD SA - South African Powerlifting",
+      "shortDescription": "Official powerlifting training app for South African athletes",
+      "fullDescription": "SBD SA is the premier powerlifting training app designed specifically for South African athletes. Whether you're a beginner or an elite lifter, our app provides everything you need to track your progress, follow proven training programs, and compete in South African powerlifting events."
+    }
+  },
+  "pricing": {
+    "model": "freemium",
+    "freeTrialDays": 14,
+    "subscription": {
+      "monthly": {
+        "price": "R59.99",
+        "currency": "ZAR",
+        "description": "Monthly premium subscription"
+      },
+      "yearly": {
+        "price": "R599.99",
+        "currency": "ZAR",
+        "description": "Yearly premium subscription - save 17%"
+      }
+    },
+    "oneTimePurchase": {
+      "lifetime": {
+        "price": "R999.99",
+        "currency": "ZAR",
+        "description": "Lifetime access - one time purchase"
+      }
+    }
+  },
+  "inAppPurchases": [
+    {
+      "productId": "sbd_sa_premium_monthly",
+      "type": "subscription",
+      "price": "R59.99",
+      "currency": "ZAR",
+      "title": "SBD SA Premium Monthly",
+      "description": "Unlock all premium features with monthly subscription"
+    },
+    {
+      "productId": "sbd_sa_premium_yearly",
+      "type": "subscription",
+      "price": "R599.99",
+      "currency": "ZAR",
+      "title": "SBD SA Premium Yearly",
+      "description": "Unlock all premium features with yearly subscription - save 17%"
+    },
+    {
+      "productId": "sbd_sa_lifetime",
+      "type": "inapp",
+      "price": "R999.99",
+      "currency": "ZAR",
+      "title": "SBD SA Lifetime",
+      "description": "Lifetime access to all premium features"
+    },
+    {
+      "productId": "sbd_sa_custom_programs",
+      "type": "inapp",
+      "price": "R199.99",
+      "currency": "ZAR",
+      "title": "Custom Training Programs",
+      "description": "Unlock custom program creation and sharing"
+    },
+    {
+      "productId": "sdsa_competition_prep",
+      "type": "inapp",
+      "price": "R149.99",
+      "currency": "ZAR",
+      "title": "Competition Prep Pack",
+      "description": "Advanced tools for competition preparation"
+    }
+  ],
+  "permissions": [
+    "android.permission.INTERNET",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.WAKE_LOCK",
+    "android.permission.VIBRATE",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "targetAudience": {
+    "primary": "Powerlifters and strength athletes in South Africa",
+    "secondary": "Fitness enthusiasts and gym-goers in South Africa",
+    "ageRange": "16-65",
+    "gender": "All",
+    "locations": ["South Africa", "Namibia", "Botswana", "Zimbabwe", "Mozambique"]
+  },
+  "marketingPoints": [
+    "First powerlifting app designed specifically for South African athletes",
+    "Works offline - perfect for areas with poor connectivity",
+    "South African plate calculator for local gym conditions",
+    "Integration with SBD South Africa events and membership",
+    "Proven training programs for all experience levels",
+    "Comprehensive progress tracking and analysis",
+    "Support for both kg and lbs measurements",
+    "Built with South African powerlifting standards in mind"
+  ],
+  "competitiveAdvantages": [
+    "South African specific features and localization",
+    "Offline functionality for rural areas",
+    "Integration with SBD South Africa",
+    "Designed for local gym equipment and conditions",
+    "Affordable pricing in South African Rand",
+    "Local support and community features",
+    "Regular updates based on South African user feedback"
+  ]
+}
