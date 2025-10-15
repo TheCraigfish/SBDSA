@@ -7,6 +7,11 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('health')
+  async health() {
+    return { status: 'ok', message: 'Auth service is running' };
+  }
+
   @Post('login')
   async login(@Body() loginRequest: LoginRequest) {
     return this.authService.login(loginRequest);

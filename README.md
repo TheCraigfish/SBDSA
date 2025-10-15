@@ -1,194 +1,297 @@
 # SBD SA - South African Powerlifting App
 
-A comprehensive powerlifting tracking application designed specifically for the South African market, focusing on Squat, Bench, and Deadlift (SBD) training.
+A comprehensive mobile application for South African powerlifters to track workouts, manage programs, analyze progress, and stay connected with the powerlifting community.
 
-## Features
+## Table of Contents
 
-- **Offline-First Architecture**: Full functionality without internet connection, with automatic sync when connection is restored
-- **Powerlifting Focus**: Specialized tracking for SBD lifts with 1RM calculation and progression
-- **South African Localization**: South African weight plates (kg), federations (PSA, SAPF, CRPSA), and payment gateways (PayFast, Yoco)
-- **Training Programs**: Pre-built powerlifting programs with South African adaptations
-- **Progress Analytics**: Detailed tracking of personal records, strength curves, and training volume
-- **Competition Integration**: South African competition calendar and qualifying standards
-- **POPIA Compliant**: Full compliance with South African data protection regulations
+1. [Project Overview](#project-overview)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+4. [Running the App](#running-the-app)
+5. [Android Studio Setup](#android-studio-setup)
+6. [Project Structure](#project-structure)
+7. [Features](#features)
+8. [API Documentation](#api-documentation)
+9. [Testing](#testing)
+10. [Contributing](#contributing)
+11. [License](#license)
+
+## Project Overview
+
+SBD SA is a monorepo containing:
+- **Backend API**: NestJS-based REST API with SQLite database
+- **Mobile App**: React Native app for iOS and Android
+- **Web Demo**: HTML/CSS/JS mobile simulator for testing
+
+## Prerequisites
+
+### Required Software
+
+1. **Node.js** (version 16 or higher)
+   - Download from [nodejs.org](https://nodejs.org/)
+   - Verify installation: `node --version`
+
+2. **npm** (version 7 or higher)
+   - Comes with Node.js
+   - Verify installation: `npm --version`
+
+3. **Java Development Kit (JDK)** (version 11 or higher)
+   - Download from [Oracle](https://www.oracle.com/java/technologies/downloads/)
+   - Verify installation: `java -version`
+
+4. **Android Studio** (latest version)
+   - Download from [developer.android.com](https://developer.android.com/studio)
+   - Required for Android development
+
+5. **Android SDK**
+   - Installed with Android Studio
+   - API level 33 or higher required
+
+6. **Git**
+   - Download from [git-scm.com](https://git-scm.com/)
+   - Verify installation: `git --version`
+
+### Environment Setup
+
+1. **Install React Native CLI**
+   ```bash
+   npm install -g react-native-cli
+   npm install -g @react-native-community/cli
+   ```
+
+2. **Set up Android environment**
+   - Open Android Studio
+   - Install Android SDK Platform 33
+   - Configure Android Virtual Device (AVD)
+   - Set ANDROID_HOME environment variable
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/sbdsa.git
+   cd sbdsa
+   ```
+
+2. **Install dependencies**
+   ```bash
+   # Install root dependencies
+   npm install
+   
+   # Install backend dependencies
+   cd packages/backend
+   npm install
+   cd ../..
+   
+   # Install mobile dependencies
+   cd packages/mobile
+   npm install
+   cd ../..
+   
+   # Install web demo dependencies
+   cd packages/web-demo
+   npm install
+   cd ../..
+   ```
+
+## Running the App
+
+### Option 1: Using the Mobile Simulator (Recommended for Testing)
+
+1. **Start the backend API**
+   ```bash
+   cd packages/backend
+   npx ts-node src/main.ts
+   ```
+
+2. **Start the web demo server**
+   ```bash
+   cd packages/web-demo
+   http-server -p 8080 -o mobile-simulator.html
+   ```
+
+3. **Access the mobile simulator**
+   - Open your browser and go to `http://localhost:8080/mobile-simulator.html`
+   - Test registration and login functionality
+
+### Option 2: Using Android Studio
+
+1. **Start the backend API**
+   ```bash
+   cd packages/backend
+   npx ts-node src/main.ts
+   ```
+
+2. **Start Metro bundler**
+   ```bash
+   cd packages/mobile
+   npm start
+   ```
+
+3. **Open Android Studio**
+   - Click "Open" and navigate to `packages/mobile/android`
+   - Wait for Gradle sync to complete
+   - Select your AVD from the device dropdown
+   - Click the "Run" button (green play icon)
+
+### Option 3: Using Command Line
+
+1. **Start the backend API**
+   ```bash
+   cd packages/backend
+   npx ts-node src/main.ts
+   ```
+
+2. **Start Metro bundler**
+   ```bash
+   cd packages/mobile
+   npm start
+   ```
+
+3. **Run the Android app**
+   ```bash
+   cd packages/mobile
+   npm run android
+   ```
+
+## Android Studio Setup
+
+### Step 1: Import the Project
+
+1. Open Android Studio
+2. Click "Open" (or File > Open)
+3. Navigate to `packages/mobile/android`
+4. Click "OK"
+
+### Step 2: Configure the Project
+
+1. Wait for Gradle sync to complete (may take several minutes)
+2. Install any missing SDK components when prompted
+3. Ensure the correct SDK version is selected (API level 33)
+
+### Step 3: Set Up an Emulator
+
+1. Go to Tools > AVD Manager
+2. Click "Create Virtual Device"
+3. Select a phone model (e.g., Pixel 6)
+4. Select a system image (API level 33 or higher)
+5. Click "Finish"
+6. Wait for the emulator to download and install
+
+### Step 4: Run the App
+
+1. Select your emulator from the device dropdown
+2. Click the "Run" button (green play icon)
+3. Wait for the build to complete
+
+### Troubleshooting Android Studio Issues
+
+1. **Gradle sync fails**
+   - Check your internet connection
+   - Try using a different network or VPN
+   - Clear Gradle cache: `cd android && gradlew cleanBuildCache`
+
+2. **Build fails with "SDK location not found"**
+   - Set ANDROID_HOME environment variable
+   - In Android Studio: File > Project Structure > SDK Location
+
+3. **Emulator is slow**
+   - Enable hardware acceleration in BIOS
+   - Use x86 images instead of ARM
+   - Allocate more RAM to the AVD
+
+4. **Metro bundler connection issues**
+   - Make sure Metro is running on port 8081
+   - Check that your firewall allows connections on port 8081
+   - Try `adb reverse tcp:8081 tcp:8081` in a terminal
 
 ## Project Structure
 
-This is a monorepo with separate packages for the mobile app, backend API, and shared code:
-
 ```
-sbdsa-app/
+sbdsa/
 ├── packages/
-│   ├── mobile/                 # React Native mobile app
-│   │   ├── android/           # Android-specific code
-│   │   ├── ios/               # iOS-specific code
-│   │   └── src/               # Cross-platform source code
-│   │       ├── components/    # Reusable UI components
-│   │       ├── navigation/    # Navigation configuration
-│   │       ├── screens/       # App screens
-│   │       ├── services/      # API and external service integration
-│   │       ├── store/         # Redux store configuration
-│   │       └── theme/         # App theming
-│   ├── backend/               # NestJS backend API
-│   │   └── src/
-│   │       ├── auth/          # Authentication module
-│   │       ├── users/         # User management module
-│   │       ├── workouts/      # Workout logging module
-│   │       ├── programs/      # Training programs module
-│   │       ├── analytics/     # Analytics module
-│   │       └── competitions/  # Competition module
-│   └── shared/                # Shared code between frontend and backend
-│       ├── src/
-│       │   ├── types/         # TypeScript type definitions
-│       │   ├── constants/     # Shared constants
-│       │   └── validation/    # Shared validation schemas
-├── infrastructure/            # Infrastructure as code
-├── docs/                     # Documentation
-└── scripts/                  # Build and deployment scripts
+│   ├── backend/          # NestJS API
+│   │   ├── src/
+│   │   │   ├── auth/      # Authentication module
+│   │   │   ├── users/     # Users module
+│   │   │   ├── workouts/  # Workouts module
+│   │   │   ├── programs/  # Programs module
+│   │   │   └── analytics/ # Analytics module
+│   │   └── ...
+│   ├── mobile/           # React Native app
+│   │   ├── src/
+│   │   │   ├── components/ # Reusable components
+│   │   │   ├── screens/    # App screens
+│   │   │   ├── navigation/ # Navigation setup
+│   │   │   ├── store/      # Redux store
+│   │   │   ├── services/   # API services
+│   │   │   └── config/     # App configuration
+│   │   ├── android/        # Android-specific code
+│   │   └── ...
+│   ├── shared/           # Shared types and utilities
+│   └── web-demo/         # HTML/CSS/JS simulator
+├── docs/                 # Documentation
+└── README.md
 ```
 
-## Technology Stack
+## Features
 
-### Mobile App (React Native)
-- React Native 0.72.x
-- TypeScript 5.0.x
-- Redux Toolkit for state management
-- React Navigation 6 for navigation
-- React Native Paper for UI components
-- WatermelonDB for offline-first data storage
+### Authentication
+- User registration and login
+- JWT-based authentication with refresh tokens
+- Password reset functionality
 
-### Backend API (NestJS)
-- NestJS 10.x with TypeScript
-- PostgreSQL with TypeORM
-- Redis for caching
-- JWT for authentication
-- AWS for infrastructure
+### Workouts
+- Create and track workouts
+- Exercise library with instructions
+- Set tracking and personal records
 
-### Shared Code
-- TypeScript 5.0.x
-- Joi for validation
-- Shared types and constants
+### Programs
+- Follow structured training programs
+- Program enrollment and progress tracking
+- Custom program creation
 
-## Getting Started
+### Analytics
+- Progress charts and statistics
+- Personal records tracking
+- Workout history analysis
 
-### Prerequisites
+### Competitions
+- Browse upcoming competitions
+- Filter by federation
+- Competition details and registration
 
-- Node.js 16.x or higher
-- npm 8.x or higher
-- React Native CLI
-- Android Studio for Android development
-- Xcode for iOS development (macOS only)
-- PostgreSQL for backend database
+## API Documentation
 
-### Installation
+The backend API documentation is available at `http://localhost:3000/api/docs` when the backend is running.
 
-1. Clone the repository:
-```bash
-git clone https://github.com/your-org/sbdsa-app.git
-cd sbdsa-app
-```
+### Key Endpoints
 
-2. Install dependencies:
-```bash
-npm run bootstrap
-```
+- **Authentication**: `/api/auth/*`
+- **Users**: `/api/users/*`
+- **Workouts**: `/api/workouts/*`
+- **Programs**: `/api/programs/*`
+- **Analytics**: `/api/analytics/*`
+- **Competitions**: `/api/competitions/*`
 
-3. Set up environment variables:
-```bash
-# For backend
-cp packages/backend/.env.example packages/backend/.env
-# Edit packages/backend/.env with your configuration
-# Important: Change the JWT secrets and database credentials in production
+## Testing
 
-# For mobile
-cp packages/mobile/.env.example packages/mobile/.env
-# Edit packages/mobile/.env with your configuration
-# Update the API_BASE_URL to point to your backend server
-```
-
-4. Set up the database:
-```bash
-# Create PostgreSQL database
-createdb sbdsa
-
-# Run migrations
-cd packages/backend
-npm run migration:run
-```
-
-### Running the Application
-
-#### Backend API
-
+### Backend Tests
 ```bash
 cd packages/backend
-npm run start:dev
-```
-
-The API will be available at `http://localhost:3000`
-
-#### Mobile App
-
-For Android:
-
-```bash
-cd packages/mobile
-npm run android
-```
-
-For iOS:
-
-```bash
-cd packages/mobile
-npm run ios
-```
-
-## Development
-
-### Code Style
-
-This project uses ESLint and Prettier for code formatting. Run the linter before committing:
-
-```bash
-npm run lint
-```
-
-### Testing
-
-Run tests for all packages:
-
-```bash
 npm test
 ```
 
-Run tests for a specific package:
-
+### Mobile Tests
 ```bash
 cd packages/mobile
 npm test
 ```
 
-### Building
-
-Build the backend:
-
-```bash
-cd packages/backend
-npm run build
-```
-
-Build the mobile app for Android:
-
+### E2E Tests
 ```bash
 cd packages/mobile
-npm run build:android
-```
-
-Build the mobile app for iOS:
-
-```bash
-cd packages/mobile
-npm run build:ios
+npm run test:e2e
 ```
 
 ## Contributing
@@ -201,16 +304,20 @@ npm run build:ios
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## South African Powerlifting Resources
+## Support
 
-- [Powerlifting South Africa (PSA)](https://www.powerliftingsa.co.za/)
-- [South African Powerlifting Federation (SAPF)](https://www.sapowerlifting.co.za/)
-- [Classic Raw Powerlifting South Africa (CRPSA)](https://www.crpsa.co.za/)
+If you encounter any issues or have questions, please:
+
+1. Check the [Issues](https://github.com/your-username/sbdsa/issues) page
+2. Create a new issue with detailed information
+3. Include steps to reproduce the problem
+4. Provide screenshots if applicable
 
 ## Acknowledgments
 
-- The React Native team for the excellent framework
-- The NestJS team for the robust backend framework
-- The South African powerlifting community for inspiration and feedback
+- South African Powerlifting Federation (SBD SA)
+- React Native community
+- NestJS team
+- All contributors

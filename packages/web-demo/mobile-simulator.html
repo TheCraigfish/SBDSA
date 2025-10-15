@@ -376,20 +376,117 @@
                         </div>
                     </div>
                     
+                    <!-- Workouts Screen -->
+                    <div id="workoutsScreen" class="screen">
+                        <div class="screen-content">
+                            <div class="dashboard">
+                                <div class="welcome">Workouts</div>
+                                
+                                <div class="quick-actions">
+                                    <div class="action-card" onclick="showNotification('Starting new workout...')">
+                                        <h3>Start Workout</h3>
+                                        <p>Begin a new training session</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading workout history...')">
+                                        <h3>Workout History</h3>
+                                        <p>View your past workouts</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading exercise library...')">
+                                        <h3>Exercise Library</h3>
+                                        <p>Browse available exercises</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading programs...')">
+                                        <h3>Training Programs</h3>
+                                        <p>Follow structured programs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analytics Screen -->
+                    <div id="analyticsScreen" class="screen">
+                        <div class="screen-content">
+                            <div class="dashboard">
+                                <div class="welcome">Analytics</div>
+                                
+                                <div class="user-info">
+                                    <p><strong>Total Workouts:</strong> 24</p>
+                                    <p><strong>Current Streak:</strong> 5 days</p>
+                                    <p><strong>Personal Records:</strong> 8</p>
+                                </div>
+                                
+                                <div class="quick-actions">
+                                    <div class="action-card" onclick="showNotification('Loading progress charts...')">
+                                        <h3>Progress Charts</h3>
+                                        <p>Track your strength gains</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading personal records...')">
+                                        <h3>Personal Records</h3>
+                                        <p>View your best lifts</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading workout history...')">
+                                        <h3>Workout History</h3>
+                                        <p>Analyze your training</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading Wilks scores...')">
+                                        <h3>Wilks Score</h3>
+                                        <p>Calculate your strength</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Screen -->
+                    <div id="profileScreen" class="screen">
+                        <div class="screen-content">
+                            <div class="dashboard">
+                                <div class="welcome">Profile</div>
+                                
+                                <div class="user-info">
+                                    <p><strong>Name:</strong> <span id="profileUserName">User</span></p>
+                                    <p><strong>Email:</strong> <span id="profileUserEmail">user@example.com</span></p>
+                                    <p><strong>Membership:</strong> <span id="profileUserMembership">Not provided</span></p>
+                                    <p><strong>Preferred Units:</strong> <span id="profileUserUnits">kg</span></p>
+                                </div>
+                                
+                                <div class="quick-actions">
+                                    <div class="action-card" onclick="showNotification('Opening edit profile...')">
+                                        <h3>Edit Profile</h3>
+                                        <p>Update your information</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Opening settings...')">
+                                        <h3>Settings</h3>
+                                        <p>App preferences</p>
+                                    </div>
+                                    <div class="action-card" onclick="showNotification('Loading achievements...')">
+                                        <h3>Achievements</h3>
+                                        <p>View your badges</p>
+                                    </div>
+                                    <div class="action-card" onclick="logout()">
+                                        <h3>Logout</h3>
+                                        <p>Sign out of your account</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="tab-bar">
-                        <div class="tab-item active">
+                        <div class="tab-item active" onclick="switchTab('dashboard')">
                             <div class="tab-icon">🏠</div>
                             <span>Home</span>
                         </div>
-                        <div class="tab-item">
+                        <div class="tab-item" onclick="switchTab('workouts')">
                             <div class="tab-icon">💪</div>
                             <span>Workouts</span>
                         </div>
-                        <div class="tab-item">
+                        <div class="tab-item" onclick="switchTab('analytics')">
                             <div class="tab-icon">📊</div>
                             <span>Analytics</span>
                         </div>
-                        <div class="tab-item">
+                        <div class="tab-item" onclick="switchTab('profile')">
                             <div class="tab-icon">👤</div>
                             <span>Profile</span>
                         </div>
@@ -448,12 +545,29 @@
             }, 3000);
         }
         
+        // Check if backend is available
+        async function checkBackendConnection() {
+            try {
+                const response = await fetch(API_BASE_URL + '/auth/health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                });
+                return response.ok;
+            } catch (error) {
+                console.error('Backend connection check failed:', error);
+                return false;
+            }
+        }
+        
         function toggleMobileScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screen + 'Screen').classList.add('active');
         }
         
-        function mobileLogin() {
+        async function mobileLogin() {
             const email = document.getElementById('mobileEmail').value;
             const password = document.getElementById('mobilePassword').value;
             
@@ -462,16 +576,26 @@
                 return;
             }
             
+            // Check if backend is available
+            const backendAvailable = await checkBackendConnection();
+            if (!backendAvailable) {
+                showNotification('Backend server is not available. Please ensure the backend is running.', 'error');
+                return;
+            }
+            
             fetch(API_BASE_URL + '/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                mode: 'cors',
                 body: JSON.stringify({ email, password }),
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Login failed: ${response.statusText}`);
+                    return response.json().then(err => {
+                        throw new Error(err.message || `Login failed: ${response.statusText}`);
+                    });
                 }
                 return response.json();
             })
@@ -483,7 +607,7 @@
                 document.getElementById('mobileUserName').textContent = currentUser.firstName;
                 document.getElementById('mobileUserEmail').textContent = currentUser.email;
                 document.getElementById('mobileUserMembership').textContent = currentUser.membershipNumber || 'Not provided';
-                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits;
+                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits || 'kg';
                 
                 // Show dashboard
                 toggleMobileScreen('dashboard');
@@ -495,7 +619,7 @@
             });
         }
         
-        function mobileRegister() {
+        async function mobileRegister() {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const firstName = document.getElementById('registerFirstName').value;
@@ -506,16 +630,26 @@
                 return;
             }
             
+            // Check if backend is available
+            const backendAvailable = await checkBackendConnection();
+            if (!backendAvailable) {
+                showNotification('Backend server is not available. Please ensure the backend is running.', 'error');
+                return;
+            }
+            
             fetch(API_BASE_URL + '/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                mode: 'cors',
                 body: JSON.stringify({ email, password, firstName, lastName }),
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Registration failed: ${response.statusText}`);
+                    return response.json().then(err => {
+                        throw new Error(err.message || `Registration failed: ${response.statusText}`);
+                    });
                 }
                 return response.json();
             })
@@ -527,7 +661,7 @@
                 document.getElementById('mobileUserName').textContent = currentUser.firstName;
                 document.getElementById('mobileUserEmail').textContent = currentUser.email;
                 document.getElementById('mobileUserMembership').textContent = currentUser.membershipNumber || 'Not provided';
-                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits;
+                document.getElementById('mobileUserUnits').textContent = currentUser.preferredUnits || 'kg';
                 
                 // Show dashboard
                 toggleMobileScreen('dashboard');
@@ -615,3 +749,62 @@
     </script>
 </body>
 </html>
+        function switchTab(tabName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(tabName + 'Screen').classList.add('active');
+            
+            // Update tab bar active state
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find and activate the corresponding tab
+            const tabItems = document.querySelectorAll('.tab-item');
+            const tabIndex = ['dashboard', 'workouts', 'analytics', 'profile'].indexOf(tabName);
+            if (tabIndex !== -1) {
+                tabItems[tabIndex].classList.add('active');
+            }
+            
+            // Update profile screen with user data if switching to profile
+            if (tabName === 'profile' && currentUser) {
+                document.getElementById('profileUserName').textContent = currentUser.firstName;
+                document.getElementById('profileUserEmail').textContent = currentUser.email;
+                document.getElementById('profileUserMembership').textContent = currentUser.membershipNumber || 'Not provided';
+                document.getElementById('profileUserUnits').textContent = currentUser.preferredUnits || 'kg';
+            }
+        }
+        
+        function logout() {
+            // Call backend logout if tokens exist
+            if (authTokens) {
+                fetch(API_BASE_URL + '/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authTokens.accessToken}`,
+                    },
+                    mode: 'cors',
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Logout API call failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                });
+            }
+            
+            // Clear user data
+            currentUser = null;
+            authTokens = null;
+            
+            // Reset to login screen
+            toggleMobileScreen('login');
+            showNotification('Logged out successfully');
+        }

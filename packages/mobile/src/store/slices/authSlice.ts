@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, AuthTokens, LoginRequest, RegisterRequest } from '@sbdsa/shared';
+import apiService from '../../services/api';
 
 // Define state interface
 interface AuthState {
@@ -26,100 +28,107 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
-      // This will be implemented with actual API call
-      // For now, return a mock response
-      const mockResponse = {
-        user: {
-          id: '1',
-          email: credentials.email,
-          firstName: 'John',
-          lastName: 'Doe',
-          preferredUnits: 'kg' as const,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        tokens: {
-          accessToken: 'mock-access-token',
-          refreshToken: 'mock-refresh-token',
-          expiresIn: 86400,
-        },
-      };
-      return mockResponse;
-    } catch (error) {
-      return rejectWithValue('Login failed. Please check your credentials.');
+      const response = await apiService.login(credentials.email, credentials.password);
+      
+      if (response.success && response.data && response.data.tokens) {
+        // Store tokens in AsyncStorage
+        await AsyncStorage.setItem('authTokens', JSON.stringify(response.data.tokens));
+        
+        return {
+          user: response.data.user || null,
+          tokens: response.data.tokens,
+        };
+      } else {
+        throw new Error(response.error?.message || 'Login failed');
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Login failed');
     }
-  },
+  }
 );
 
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData: RegisterRequest, { rejectWithValue }) => {
     try {
-      // This will be implemented with actual API call
-      // For now, return a mock response
-      const mockResponse = {
-        user: {
-          id: '1',
-          email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          dateOfBirth: userData.dateOfBirth,
-          gender: userData.gender,
-          preferredUnits: 'kg' as const,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        tokens: {
-          accessToken: 'mock-access-token',
-          refreshToken: 'mock-refresh-token',
-          expiresIn: 86400,
-        },
-      };
-      return mockResponse;
-    } catch (error) {
-      return rejectWithValue('Registration failed. Please try again.');
+      const response = await apiService.register(
+        userData.email,
+        userData.password,
+        userData.firstName,
+        userData.lastName
+      );
+      
+      if (response.success && response.data && response.data.tokens) {
+        // Store tokens in AsyncStorage
+        await AsyncStorage.setItem('authTokens', JSON.stringify(response.data.tokens));
+        
+        return {
+          user: response.data.user || null,
+          tokens: response.data.tokens,
+        };
+      } else {
+        throw new Error(response.error?.message || 'Registration failed');
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Registration failed');
     }
-  },
+  }
 );
 
 export const refreshToken = createAsyncThunk(
   'auth/refreshToken',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const state = getState() as { auth: AuthState };
-      const { tokens } = state.auth;
-      
-      if (!tokens?.refreshToken) {
-        return rejectWithValue('No refresh token available');
-      }
-      
-      // This will be implemented with actual API call
-      // For now, return a mock response
-      const mockResponse = {
-        accessToken: 'new-mock-access-token',
-        refreshToken: 'new-mock-refresh-token',
-        expiresIn: 86400,
-      };
-      return mockResponse;
-    } catch (error) {
-      return rejectWithValue('Token refresh failed');
+      // API service handles token refresh automatically
+      // This is just a placeholder for state management
+      throw new Error('Token refresh should be handled automatically by the API service');
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Token refresh failed');
     }
-  },
+  }
 );
 
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      // This will be implemented with actual API call
-      // For now, just return success
-      return;
-    } catch (error) {
-      return rejectWithValue('Logout failed');
+      await apiService.logout();
+      
+      // Tokens are cleared in the API service
+      return true;
+    } catch (error: any) {
+      // Even if the API call fails, return success
+      // The API service clears local tokens even if the server call fails
+      return true;
     }
-  },
+  }
+);
+
+export const loadStoredAuth = createAsyncThunk(
+  'auth/loadStored',
+  async (_, { rejectWithValue }) => {
+    try {
+      const tokens = await AsyncStorage.getItem('authTokens');
+      
+      if (!tokens) {
+        return null;
+      }
+      
+      const parsedTokens = JSON.parse(tokens);
+      
+      // TODO: Validate tokens with backend if needed
+      // For now, just return the tokens
+      
+      return {
+        user: null, // We would need to fetch user data
+        tokens: parsedTokens,
+      };
+    } catch (error: any) {
+      // Clear invalid tokens
+      await AsyncStorage.removeItem('authTokens');
+      return rejectWithValue(error.message || 'Failed to load stored auth');
+    }
+  }
 );
 
 // Create slice
@@ -140,6 +149,26 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Load stored auth
+    builder
+      .addCase(loadStoredAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(loadStoredAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload) {
+          state.tokens = action.payload.tokens;
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(loadStoredAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.tokens = null;
+      });
+    
     // Login
     builder
       .addCase(loginUser.pending, (state) => {
@@ -149,13 +178,20 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.tokens = action.payload.tokens;
+        state.tokens = {
+          accessToken: action.payload.tokens.accessToken,
+          refreshToken: action.payload.tokens.refreshToken,
+          expiresIn: action.payload.tokens.expiresIn || 86400, // Default to 24 hours
+        };
         state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.tokens = null;
       });
 
     // Register
@@ -167,28 +203,20 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.tokens = action.payload.tokens;
+        state.tokens = {
+          accessToken: action.payload.tokens.accessToken,
+          refreshToken: action.payload.tokens.refreshToken,
+          expiresIn: action.payload.tokens.expiresIn || 86400, // Default to 24 hours
+        };
         state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-      });
-
-    // Refresh token
-    builder
-      .addCase(refreshToken.fulfilled, (state, action) => {
-        if (state.tokens) {
-          state.tokens.accessToken = action.payload.accessToken;
-          state.tokens.refreshToken = action.payload.refreshToken;
-          state.tokens.expiresIn = action.payload.expiresIn;
-        }
-      })
-      .addCase(refreshToken.rejected, (state) => {
+        state.isAuthenticated = false;
         state.user = null;
         state.tokens = null;
-        state.isAuthenticated = false;
       });
 
     // Logout
@@ -198,8 +226,7 @@ const authSlice = createSlice({
         state.tokens = null;
         state.isAuthenticated = false;
       })
-      .addCase(logoutUser.rejected, (state, action) => {
-        state.error = action.payload as string;
+      .addCase(logoutUser.rejected, (state) => {
         // Still clear auth state even if logout API call failed
         state.user = null;
         state.tokens = null;

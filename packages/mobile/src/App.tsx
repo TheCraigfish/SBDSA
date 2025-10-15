@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -6,12 +6,18 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { store, persistor } from './store';
+import { loadStoredAuth } from './store/slices/authSlice';
 import { AppNavigator } from './navigation/AppNavigator';
 import { theme } from './theme';
 import LoadingIndicator from './components/common/LoadingIndicator';
 import SyncStatusIndicator from './components/common/SyncStatusIndicator';
 
 const App: React.FC = () => {
+  useEffect(() => {
+    // Load stored authentication on app startup
+    store.dispatch(loadStoredAuth());
+  }, []);
+
   return (
     <ReduxProvider store={store}>
       <PersistGate loading={<LoadingIndicator />} persistor={persistor}>

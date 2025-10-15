@@ -1,17 +1,75 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '@sbdsa/shared';
+import { useDispatch, useSelector } from 'react-redux';
+import { AuthStackParamList, LoginRequest } from '@sbdsa/shared';
+import { loginUser, clearError } from '../../store/slices/authSlice';
+import { RootState } from '../../store';
+import { AppDispatch } from '../../store';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    // Clear any previous errors when component mounts
+    dispatch(clearError());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Navigate to main app if authenticated
+    if (isAuthenticated) {
+      navigation.navigate('Register' as any); // Temporary fix, will update when Main navigator is implemented
+    }
+  }, [isAuthenticated, navigation]);
+
+  useEffect(() => {
+    // Show error alert if there's an error
+    if (error) {
+      Alert.alert('Login Error', error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
+  const validateForm = (): boolean => {
+    if (!email) {
+      Alert.alert('Validation Error', 'Please enter your email');
+      return false;
+    }
+    
+    if (!password) {
+      Alert.alert('Validation Error', 'Please enter your password');
+      return false;
+    }
+    
+    // Simple email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Validation Error', 'Please enter a valid email address');
+      return false;
+    }
+    
+    return true;
+  };
 
   const handleLogin = () => {
-    // Placeholder login logic
-    Alert.alert('Login', `Login attempt with email: ${email}`);
+    if (validateForm()) {
+      const credentials: LoginRequest = { email, password };
+      dispatch(loginUser(credentials));
+    }
   };
 
   const handleForgotPassword = () => {
@@ -35,6 +93,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          placeholderTextColor="#888"
         />
         
         <TextInput
@@ -43,10 +102,19 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          placeholderTextColor="#888"
         />
         
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity 
+          style={[styles.button, isLoading && styles.buttonDisabled]} 
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.linkButton} onPress={handleForgotPassword}>
@@ -91,7 +159,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     color: '#fff',
     marginBottom: 15,
-    fontSize: 16,
   },
   button: {
     backgroundColor: '#00875A',
@@ -101,10 +168,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
+  buttonDisabled: {
+    backgroundColor: '#666',
+  },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   linkButton: {
     padding: 10,
