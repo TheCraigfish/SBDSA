@@ -12,7 +12,7 @@
   },
   "platforms": ["android", "ios"],
   "android": {
-    "package": "co.za.sbdsa.app",
+    "package": "com.sbdsa",
     "versionCode": 1,
     "adaptiveIcon": {
       "foregroundImage": "./src/assets/images/adaptive-icon.png",
